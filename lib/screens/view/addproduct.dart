@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../services/auth.dart';
-import 'home.dart';
 
 class AddProduct extends StatefulWidget {
   @override
@@ -22,10 +21,7 @@ class _AddProductState extends State<AddProduct> {
           FlatButton.icon(
               onPressed: () async {
                 await _auth.signOut();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Home()),
-                );
+                Navigator.pop(context);
               },
               icon: Icon(Icons.person),
               label: Text('Log Out'))
