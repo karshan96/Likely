@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:Likely/view/login.dart';
+import '../authenticate/signin.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -28,7 +28,10 @@ class _HomeState extends State<Home> {
           FlatButton(
               child: Text('Login'),
               onPressed: () {
-                LogIn();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignIn()),
+                );
               },
               textColor: Colors.black),
           FlatButton(

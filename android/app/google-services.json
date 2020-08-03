@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "916120046767",
+    "firebase_url": "https://likely-b96b4.firebaseio.com",
+    "project_id": "likely-b96b4",
+    "storage_bucket": "likely-b96b4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:916120046767:android:3d96691800460d0a92585a",
+        "android_client_info": {
+          "package_name": "com.karshan.Likely"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "916120046767-nob02fdalres8brjjt08kehl5rghl4ga.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKeI5guv-fqxituev1JoL6I6FT2VDgDXY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "916120046767-nob02fdalres8brjjt08kehl5rghl4ga.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
