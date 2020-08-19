@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../authenticate/signin.dart';
+import '../authenticate/register.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -36,7 +37,12 @@ class _HomeState extends State<Home> {
               textColor: Colors.black),
           FlatButton(
               child: Text('Register'),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Register()),
+                );
+              },
               textColor: Colors.black),
           FlatButton(
               child: Text('Post Your Ad'),

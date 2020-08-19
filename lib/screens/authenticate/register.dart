@@ -1,28 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:Likely/services/auth.dart';
 
-class SignIn extends StatefulWidget {
+class Register extends StatefulWidget {
   final Function toggleView;
-  SignIn({this.toggleView});
+  Register({this.toggleView});
 
   @override
-  _SignInState createState() => _SignInState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _SignInState extends State<SignIn> {
+class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
 
+  final _formKey = GlobalKey<FormState>();
+  String _fullname = '';
   String _email = '';
   String _password = '';
+  String _contactno = '';
   String _error = '';
-  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.green,
-        title: Text('SignIn'),
+        title: Text('Register'),
         elevation: 0.0,
       ),
       body: Container(
@@ -32,19 +35,42 @@ class _SignInState extends State<SignIn> {
             child: new ListView(
               shrinkWrap: true,
               children: <Widget>[
-                new Hero(
-                  tag: 'hero',
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: 84.0,
-                      child: Image.asset('assets/images/login.png'),
-                    ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
+                  child: new TextFormField(
+                    maxLines: 1,
+                    keyboardType: TextInputType.emailAddress,
+                    autofocus: false,
+                    decoration: new InputDecoration(
+                        hintText: 'Full Name',
+                        icon: new Icon(
+                          Icons.perm_identity,
+                          color: Colors.grey,
+                        )),
+                    validator: (value) =>
+                        value.isEmpty ? 'Full Name can\'t be empty' : null,
+                    onChanged: (value) => _fullname = value.trim(),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
+                  padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+                  child: new TextFormField(
+                    maxLines: 1,
+                    keyboardType: TextInputType.emailAddress,
+                    autofocus: false,
+                    decoration: new InputDecoration(
+                        hintText: 'Contact Number',
+                        icon: new Icon(
+                          Icons.phone,
+                          color: Colors.grey,
+                        )),
+                    validator: (value) =>
+                        value.isEmpty ? 'Contack Number can\'t be empty' : null,
+                    onChanged: (value) => _contactno = value.trim(),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
                   child: new TextFormField(
                     maxLines: 1,
                     keyboardType: TextInputType.emailAddress,
@@ -92,18 +118,18 @@ class _SignInState extends State<SignIn> {
                           elevation: 5.0,
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(30.0)),
-                          color: Colors.blue,
-                          child: new Text('Login',
+                          color: Colors.red,
+                          child: new Text('Create an account',
                               // _isLoginForm ? 'Login' : 'Create account',
                               style: new TextStyle(
                                   fontSize: 20.0, color: Colors.white)),
                           onPressed: () async {
                             if (_formKey.currentState.validate()) {
                               dynamic result = await _auth
-                                  .signWithEmailPassword(_email, _password);
+                                  .registerWithEmailPassword(_email, _password);
                               if (result == null) {
-                                setState(() =>
-                                    _error = 'Could not sign in with this');
+                                setState(
+                                    () => _error = 'Please add valid Email');
                               }
                             }
                           }
@@ -112,34 +138,15 @@ class _SignInState extends State<SignIn> {
                     )),
                 FlatButton(
                     child: new Text(
-                      'Create a Account',
+                      'LogIn',
                       // _isLoginForm ? 'Create an account' : 'Have an account? Sign in',
                       // style: new TextStyle(
                       // fontSize: 18.0, fontWeight: FontWeight.w300)
                     ),
-                    onPressed: () => widget.toggleView().catchError((e) {
-                          print(e);
-                        }))
+                    onPressed: () => widget.toggleView()),
               ],
             ),
           )),
     );
   }
 }
-
-// Widget showErrorMessage() {
-//   if (_errorMessage.length > 0 && _errorMessage != null) {
-//     return new Text(
-//       _errorMessage,
-//       style: TextStyle(
-//           fontSize: 13.0,
-//           color: Colors.red,
-//           height: 1.0,
-//           fontWeight: FontWeight.w300),
-//     );
-//   } else {
-//     return new Container(
-//       height: 0.0,
-//     );
-//   }
-// }
