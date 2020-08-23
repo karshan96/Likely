@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:Likely/services/auth.dart';
+import 'package:Likely/screens/custom_widgets/menu_widget.dart';
+import 'package:flutter/services.dart';
 
 class Register extends StatefulWidget {
   final Function toggleView;
@@ -23,11 +25,6 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: Text('Register'),
-        elevation: 0.0,
-      ),
       body: Container(
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
           child: new Form(
@@ -35,6 +32,29 @@ class _RegisterState extends State<Register> {
             child: new ListView(
               shrinkWrap: true,
               children: <Widget>[
+                Stack(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        right: 15,
+                        left: 15,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          MenuWidget(
+                              iconImg: Icons.arrow_back,
+                              iconColor: Colors.grey,
+                              conBackColor: Colors.transparent,
+                              onbtnTap: () {
+                                Navigator.of(context).pop(false);
+                              }),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
                   child: new TextFormField(
@@ -127,6 +147,7 @@ class _RegisterState extends State<Register> {
                             if (_formKey.currentState.validate()) {
                               dynamic result = await _auth
                                   .registerWithEmailPassword(_email, _password);
+                              Navigator.of(context).pop(false);
                               if (result == null) {
                                 setState(
                                     () => _error = 'Please add valid Email');

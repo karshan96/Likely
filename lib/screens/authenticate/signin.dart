@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:Likely/services/auth.dart';
+import 'package:flutter/services.dart';
+
+import 'package:Likely/screens/custom_widgets/menu_widget.dart';
 
 class SignIn extends StatefulWidget {
   final Function toggleView;
@@ -20,11 +23,6 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: Text('SignIn'),
-        elevation: 0.0,
-      ),
       body: Container(
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
           child: new Form(
@@ -32,17 +30,40 @@ class _SignInState extends State<SignIn> {
             child: new ListView(
               shrinkWrap: true,
               children: <Widget>[
-                new Hero(
-                  tag: 'hero',
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: 84.0,
-                      child: Image.asset('assets/images/login.png'),
-                    ),
-                  ),
+                Stack(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 15,
+                        right: 15,
+                        left: 15,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          MenuWidget(
+                              iconImg: Icons.arrow_back,
+                              iconColor: Colors.grey,
+                              conBackColor: Colors.transparent,
+                              onbtnTap: () {
+                                Navigator.of(context).pop(false);
+                              }),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
+                // new Hero(
+                //   tag: 'hero',
+                //   child: Padding(
+                //     padding: EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
+                //     child: CircleAvatar(
+                //       backgroundColor: Colors.transparent,
+                //       radius: 84.0,
+                //       child: Image.asset('assets/images/login.png'),
+                //     ),
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
                   child: new TextFormField(
@@ -101,6 +122,7 @@ class _SignInState extends State<SignIn> {
                             if (_formKey.currentState.validate()) {
                               dynamic result = await _auth
                                   .signWithEmailPassword(_email, _password);
+                              // Navigator.of(context).pop(false);
                               if (result == null) {
                                 setState(() =>
                                     _error = 'Could not sign in with this');
