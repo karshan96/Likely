@@ -71,7 +71,7 @@ class _SignInState extends State<SignIn> {
                     keyboardType: TextInputType.emailAddress,
                     autofocus: false,
                     decoration: new InputDecoration(
-                        hintText: 'Email',
+                        labelText: 'Email',
                         icon: new Icon(
                           Icons.mail,
                           color: Colors.grey,
@@ -88,7 +88,7 @@ class _SignInState extends State<SignIn> {
                     obscureText: true,
                     autofocus: false,
                     decoration: new InputDecoration(
-                        hintText: 'Password',
+                        labelText: 'Password',
                         icon: new Icon(
                           Icons.lock,
                           color: Colors.grey,
@@ -122,7 +122,7 @@ class _SignInState extends State<SignIn> {
                             if (_formKey.currentState.validate()) {
                               dynamic result = await _auth
                                   .signWithEmailPassword(_email, _password);
-                              // Navigator.of(context).pop(false);
+                              Navigator.of(context).pop(false);
                               if (result == null) {
                                 setState(() =>
                                     _error = 'Could not sign in with this');

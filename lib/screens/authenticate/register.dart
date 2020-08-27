@@ -15,10 +15,8 @@ class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
 
   final _formKey = GlobalKey<FormState>();
-  String _fullname = '';
   String _email = '';
   String _password = '';
-  String _contactno = '';
   String _error = '';
 
   @override
@@ -56,47 +54,13 @@ class _RegisterState extends State<Register> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
-                  child: new TextFormField(
-                    maxLines: 1,
-                    keyboardType: TextInputType.emailAddress,
-                    autofocus: false,
-                    decoration: new InputDecoration(
-                        hintText: 'Full Name',
-                        icon: new Icon(
-                          Icons.perm_identity,
-                          color: Colors.grey,
-                        )),
-                    validator: (value) =>
-                        value.isEmpty ? 'Full Name can\'t be empty' : null,
-                    onChanged: (value) => _fullname = value.trim(),
-                  ),
-                ),
-                Padding(
                   padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
                   child: new TextFormField(
                     maxLines: 1,
                     keyboardType: TextInputType.emailAddress,
                     autofocus: false,
                     decoration: new InputDecoration(
-                        hintText: 'Contact Number',
-                        icon: new Icon(
-                          Icons.phone,
-                          color: Colors.grey,
-                        )),
-                    validator: (value) =>
-                        value.isEmpty ? 'Contack Number can\'t be empty' : null,
-                    onChanged: (value) => _contactno = value.trim(),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
-                  child: new TextFormField(
-                    maxLines: 1,
-                    keyboardType: TextInputType.emailAddress,
-                    autofocus: false,
-                    decoration: new InputDecoration(
-                        hintText: 'Email',
+                        labelText: 'Email',
                         icon: new Icon(
                           Icons.mail,
                           color: Colors.grey,
@@ -113,7 +77,7 @@ class _RegisterState extends State<Register> {
                     obscureText: true,
                     autofocus: false,
                     decoration: new InputDecoration(
-                        hintText: 'Password',
+                        labelText: 'Password',
                         icon: new Icon(
                           Icons.lock,
                           color: Colors.grey,
