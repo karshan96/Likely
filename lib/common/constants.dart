@@ -3,7 +3,6 @@ import 'package:Likely/models/data_model.dart';
 class Constants {
   static List<House> houseList = [
     House(
-      id: 1,
       amount: 1000000,
       address: 'Dehiwala, 10350',
       bedrooms: 3,
@@ -13,7 +12,6 @@ class Constants {
       kitchen: 1,
     ),
     House(
-      id: 2,
       amount: 2000000,
       address: 'Kollupitiya, 00700',
       bedrooms: 4,
@@ -23,7 +21,6 @@ class Constants {
       kitchen: 2,
     ),
     House(
-      id: 3,
       amount: 3000000,
       address: 'Bambalapitiya, 00300',
       bedrooms: 5,
@@ -33,7 +30,6 @@ class Constants {
       kitchen: 1,
     ),
     House(
-      id: 4,
       amount: 4000000,
       address: 'Borella, 01000',
       bedrooms: 3,
@@ -43,7 +39,6 @@ class Constants {
       kitchen: 2,
     ),
     House(
-      id: 5,
       amount: 5000000,
       address: 'Wellawatta, 10600',
       bedrooms: 4,
@@ -53,7 +48,6 @@ class Constants {
       kitchen: 1,
     ),
     House(
-      id: 6,
       amount: 6000000,
       address: 'Kotahena, 01300',
       bedrooms: 5,
