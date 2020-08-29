@@ -1,4 +1,6 @@
+import 'package:Likely/models/data_model.dart';
 import 'package:Likely/screens/view/home.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:Likely/screens/custom_widgets/menu_widget.dart';
@@ -20,15 +22,11 @@ class AddProduct extends StatefulWidget {
 class _AddProductState extends State<AddProduct> {
   final AuthService _auth = AuthService();
 
-  final _formKey = GlobalKey<FormState>();
-  int amount = 0;
-  int bedrooms = 0;
-  int bathrooms = 0;
-  int garages = 0;
-  int kitchen = 0;
-  String date;
-  String address = '';
-  double squarefoot = 0.0;
+  List<House> houses = List();
+  House house;
+  DatabaseReference houseRef;
+
+  final GlobalKey<FormBuilderState> formKey = GlobalKey<FormBuilderState>();
   String _error = '';
 
   PickedFile imageFile;
@@ -39,6 +37,54 @@ class _AddProductState extends State<AddProduct> {
   final TextEditingController maxWidthController = TextEditingController();
   final TextEditingController maxHeightController = TextEditingController();
   final TextEditingController qualityController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      house = House(
+          key: '',
+          amount: 0,
+          address: '',
+          date: '',
+          bedrooms: 0,
+          bathrooms: 0,
+          kitchen: 0,
+          garages: 0,
+          squarefoot: 0.0);
+      final FirebaseDatabase database = FirebaseDatabase.instance;
+      houseRef = database.reference().child('houses');
+      houseRef.onChildAdded.listen(_onEntryAdded);
+      houseRef.onChildChanged.listen(_onEntryChanged);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  _onEntryAdded(Event event) {
+    setState(() {
+      houses.add(House.fromSnapshot(event.snapshot));
+    });
+  }
+
+  _onEntryChanged(Event event) {
+    var old = houses.singleWhere((entry) {
+      return entry.key == event.snapshot.key;
+    });
+    setState(() {
+      houses[houses.indexOf(old)] = House.fromSnapshot(event.snapshot);
+    });
+  }
+
+  void handleSubmit() {
+    try {
+      FormBuilderState form = formKey.currentState;
+      houseRef.push().set(house.toJson());
+      form.reset();
+    } catch (e) {
+      print(e);
+    }
+  }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
     await _displayPickImageDialog(context,
@@ -112,44 +158,49 @@ class _AddProductState extends State<AddProduct> {
                 ],
               ),
               FormBuilder(
-                key: _formKey,
+                key: formKey,
                 autovalidate: true,
                 child: Column(
                   children: <Widget>[
                     FormBuilderDateTimePicker(
                       maxLines: 1,
-                      obscureText: true,
                       autofocus: false,
                       attribute: "date",
                       inputType: InputType.date,
                       format: DateFormat("yyyy-MM-dd"),
                       decoration: InputDecoration(labelText: "Date"),
+                      onChanged: (val) {
+                        house.date = val.toString();
+                      },
                     ),
                     FormBuilderTextField(
                       attribute: "address",
+                      initialValue: "",
                       decoration: InputDecoration(labelText: "Address"),
+                      onChanged: (val) => house.address = val,
                     ),
                     FormBuilderTextField(
                       maxLines: 1,
-                      obscureText: true,
                       autofocus: false,
                       attribute: "amount",
+                      initialValue: "",
                       decoration: InputDecoration(labelText: "Amount"),
+                      onChanged: (val) => house.amount = int.parse(val),
                       validators: [
                         FormBuilderValidators.numeric(),
-                        FormBuilderValidators.max(70),
                       ],
                     ),
                     FormBuilderTextField(
                       maxLines: 1,
-                      obscureText: true,
                       autofocus: false,
                       attribute: "squarefoot",
+                      initialValue: "",
                       decoration: InputDecoration(labelText: "Squarefoot"),
-                      validators: [
-                        FormBuilderValidators.numeric(),
-                        FormBuilderValidators.max(70),
-                      ],
+                      onChanged: (val) => house.squarefoot = double.parse(val),
+                      // validators: [
+                      //   FormBuilderValidators.numeric(),
+                      //   FormBuilderValidators.max(70),
+                      // ],
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -160,10 +211,11 @@ class _AddProductState extends State<AddProduct> {
                             autofocus: false,
                             attribute: "bedrooms",
                             decoration: InputDecoration(labelText: "Bedrooms"),
+                            onChanged: (val) => house.bedrooms = val,
                             // initialValue: 'Male',
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
-                            items: [1, 2, 3, 4, 5, 6]
+                            items: [0, 1, 2, 3, 4, 5, 6]
                                 .map((bedrooms) => DropdownMenuItem(
                                     value: bedrooms, child: Text("$bedrooms")))
                                 .toList(),
@@ -172,14 +224,16 @@ class _AddProductState extends State<AddProduct> {
                         Expanded(
                           child: FormBuilderDropdown(
                             autofocus: false,
-                            attribute: "bedrooms",
-                            decoration: InputDecoration(labelText: "Bedrooms"),
+                            attribute: "bathrooms",
+                            decoration: InputDecoration(labelText: "Bathrooms"),
+                            onChanged: (val) => house.bathrooms = val,
                             // initialValue: 'Male',
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
-                            items: [1, 2, 3, 4, 5, 6]
-                                .map((bedrooms) => DropdownMenuItem(
-                                    value: bedrooms, child: Text("$bedrooms")))
+                            items: [0, 1, 2, 3, 4, 5, 6]
+                                .map((bathrooms) => DropdownMenuItem(
+                                    value: bathrooms,
+                                    child: Text("$bathrooms")))
                                 .toList(),
                           ),
                         ),
@@ -194,10 +248,10 @@ class _AddProductState extends State<AddProduct> {
                             autofocus: false,
                             attribute: "kitchen",
                             decoration: InputDecoration(labelText: "Kitchen"),
-                            // initialValue: 'Male',
+                            onChanged: (val) => house.kitchen = val,
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
-                            items: [1, 2, 3, 4, 5, 6]
+                            items: [0, 1, 2, 3, 4, 5, 6]
                                 .map((kitchen) => DropdownMenuItem(
                                     value: kitchen, child: Text("$kitchen")))
                                 .toList(),
@@ -208,10 +262,10 @@ class _AddProductState extends State<AddProduct> {
                             autofocus: false,
                             attribute: "garages",
                             decoration: InputDecoration(labelText: "Garages"),
-                            // initialValue: 'Male',
+                            onChanged: (val) => house.garages = val,
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
-                            items: [1, 2, 3, 4, 5, 6]
+                            items: [0, 1, 2, 3, 4, 5, 6]
                                 .map((garages) => DropdownMenuItem(
                                     value: garages, child: Text("$garages")))
                                 .toList(),
@@ -255,8 +309,10 @@ class _AddProductState extends State<AddProduct> {
                               child: new Text('Add Product',
                                   style: new TextStyle(
                                       fontSize: 20.0, color: Colors.white)),
-                              onPressed: () async {
-                                if (_formKey.currentState.validate()) {}
+                              onPressed: () {
+                                if (formKey.currentState.saveAndValidate()) {
+                                  handleSubmit();
+                                }
                               }),
                         )),
                     FlatButton(
@@ -264,7 +320,7 @@ class _AddProductState extends State<AddProduct> {
                           'Reset',
                         ),
                         onPressed: () {
-                          _formKey.currentState.reset();
+                          formKey.currentState.reset();
                         }),
                   ],
                 ),

@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+// import 'package:flutter/cupertino.dart';
 
 class House {
   House({
@@ -11,6 +12,7 @@ class House {
     this.garages,
     this.kitchen,
     this.date,
+    // this.image
   });
 
   int amount;
@@ -22,6 +24,7 @@ class House {
   double squarefoot;
   String key;
   String date;
+  // Image image;
 
   House.fromSnapshot(DataSnapshot snapshot)
       : key = snapshot.key,
@@ -33,6 +36,7 @@ class House {
         garages = snapshot.value['garages'],
         kitchen = snapshot.value['kitchen'],
         date = snapshot.value['date'];
+  // image = snapshot.value['image'];
 
   toJson() {
     return {
@@ -44,6 +48,7 @@ class House {
       'garages': garages,
       'kitchen': kitchen,
       'date': date,
+      // 'image': image,
     };
   }
 }
