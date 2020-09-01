@@ -1,6 +1,7 @@
 import 'package:Likely/models/data_model.dart';
 import 'package:Likely/screens/view/home.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:Likely/screens/custom_widgets/menu_widget.dart';
@@ -28,15 +29,14 @@ class _AddProductState extends State<AddProduct> {
 
   final GlobalKey<FormBuilderState> formKey = GlobalKey<FormBuilderState>();
   String _error = '';
+  File sampleImage;
+  String url = '';
 
   PickedFile imageFile;
   dynamic pickImageError;
   String _retrieveDataError;
 
   final ImagePicker _picker = ImagePicker();
-  final TextEditingController maxWidthController = TextEditingController();
-  final TextEditingController maxHeightController = TextEditingController();
-  final TextEditingController qualityController = TextEditingController();
 
   @override
   void initState() {
@@ -76,8 +76,9 @@ class _AddProductState extends State<AddProduct> {
     });
   }
 
-  void handleSubmit() {
+  void handleSubmit(url) {
     try {
+      house.imageUrl = url;
       FormBuilderState form = formKey.currentState;
       houseRef.push().set(house.toJson());
       form.reset();
@@ -105,6 +106,23 @@ class _AddProductState extends State<AddProduct> {
         });
       }
     });
+  }
+
+  void uploadImage() async {
+    final StorageReference postImageRef =
+        FirebaseStorage.instance.ref().child('House images');
+
+    var timeKey = new DateTime.now();
+
+    final StorageUploadTask uploadTask =
+        postImageRef.child(timeKey.toString() + '.jpg').putFile(sampleImage);
+
+    var imageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
+    print(imageUrl);
+
+    url = imageUrl;
+
+    handleSubmit(url);
   }
 
   @override
@@ -281,7 +299,7 @@ class _AddProductState extends State<AddProduct> {
                         _onImageButtonPressed(ImageSource.gallery,
                             context: context);
                       },
-                      heroTag: 'image0',
+                      heroTag: 'image',
                       tooltip: 'Pick Image from gallery',
                       child: const Icon(Icons.photo_library),
                     ),
@@ -311,7 +329,7 @@ class _AddProductState extends State<AddProduct> {
                                       fontSize: 20.0, color: Colors.white)),
                               onPressed: () {
                                 if (formKey.currentState.saveAndValidate()) {
-                                  handleSubmit();
+                                  uploadImage();
                                 }
                               }),
                         )),
@@ -336,7 +354,7 @@ class _AddProductState extends State<AddProduct> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Add optional parameters'),
+            title: Text('Add Image'),
             actions: <Widget>[
               FlatButton(
                 child: const Text('CANCEL'),
@@ -347,16 +365,7 @@ class _AddProductState extends State<AddProduct> {
               FlatButton(
                   child: const Text('PICK'),
                   onPressed: () {
-                    double width = maxWidthController.text.isNotEmpty
-                        ? double.parse(maxWidthController.text)
-                        : null;
-                    double height = maxHeightController.text.isNotEmpty
-                        ? double.parse(maxHeightController.text)
-                        : null;
-                    int quality = qualityController.text.isNotEmpty
-                        ? int.parse(qualityController.text)
-                        : null;
-                    onPick(width, height, quality);
+                    onPick(null, null, null);
                     Navigator.of(context).pop();
                   }),
             ],
@@ -370,6 +379,7 @@ class _AddProductState extends State<AddProduct> {
       return retrieveError;
     }
     if (imageFile != null) {
+      sampleImage = File(imageFile.path);
       return Image.file(File(imageFile.path));
     } else if (pickImageError != null) {
       return Text(
