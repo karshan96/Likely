@@ -12,6 +12,22 @@ import 'package:firebase_database/firebase_database.dart';
 
 import 'package:Likely/screens/authenticate/register.dart';
 import 'package:Likely/screens/authenticate/signin.dart';
+import 'dart:async';
+
+class Debouncer {
+  final int milliseconds;
+  VoidCallback action;
+  Timer _timer;
+
+  Debouncer({this.milliseconds});
+
+  run(VoidCallback action) {
+    if (null != _timer) {
+      _timer.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
 
 class Home extends StatefulWidget {
   @override
@@ -27,6 +43,8 @@ class _HomeState extends State<Home> {
   ];
   static List<House> houseList = List();
   House house;
+  List<House> filteredHouses = List();
+  final debouncer = Debouncer(milliseconds: 500);
 
   @override
   void initState() {
@@ -36,6 +54,7 @@ class _HomeState extends State<Home> {
           FirebaseDatabase.instance.reference().child("houses");
       db.once().then((DataSnapshot snapshot) {
         Map<dynamic, dynamic> values = snapshot.value;
+        houseList.clear();
         values.forEach((key, values) {
           house = new House(
               amount: values['amount'],
@@ -51,6 +70,9 @@ class _HomeState extends State<Home> {
           print(key);
           houseList.add(house);
         });
+      });
+      setState(() {
+        filteredHouses = houseList;
       });
     } catch (e) {
       print(e);
@@ -140,15 +162,30 @@ class _HomeState extends State<Home> {
                 ),
               ),
               SizedBox(
-                height: 10,
+                height: 15.0,
               ),
-              Text(
-                "Colombo",
-                style: GoogleFonts.notoSans(
-                  fontSize: 36,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
+              TextField(
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.all(10.0),
+                  hintText: 'Colombo',
+                  hintStyle: GoogleFonts.notoSans(
+                    fontSize: 24,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+                style: TextStyle(fontSize: 24),
+                onChanged: (string) {
+                  debouncer.run(() {
+                    setState(() {
+                      filteredHouses = houseList
+                          .where((u) => (u.address
+                              .toLowerCase()
+                              .contains(string.toLowerCase())))
+                          .toList();
+                    });
+                  });
+                },
               ),
               Divider(
                 color: Colors.grey,
@@ -172,12 +209,12 @@ class _HomeState extends State<Home> {
               ),
               Column(
                 children: List.generate(
-                  houseList.length,
+                  filteredHouses.length,
                   (index) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: ImageWidget(
-                        houseList[index],
+                        filteredHouses[index],
                         index,
                       ),
                     );

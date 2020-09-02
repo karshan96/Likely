@@ -214,7 +214,7 @@ class _AddProductState extends State<AddProduct> {
                       attribute: "squarefoot",
                       initialValue: "",
                       decoration: InputDecoration(labelText: "Squarefoot"),
-                      onChanged: (val) => house.squarefoot = val,
+                      onChanged: (val) => house.squarefoot = int.parse(val),
                       // validators: [
                       //   FormBuilderValidators.numeric(),
                       //   FormBuilderValidators.max(70),
