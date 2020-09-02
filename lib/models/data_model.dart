@@ -10,7 +10,8 @@ class House {
       this.garages,
       this.kitchen,
       this.date,
-      this.imageUrl});
+      this.imageUrl,
+      this.description});
 
   int amount;
   int bedrooms;
@@ -22,6 +23,7 @@ class House {
   String key;
   String date;
   String imageUrl;
+  String description;
 
   House.fromSnapshot(DataSnapshot snapshot)
       : key = snapshot.key,
@@ -33,7 +35,8 @@ class House {
         garages = snapshot.value['garages'],
         kitchen = snapshot.value['kitchen'],
         date = snapshot.value['date'],
-        imageUrl = snapshot.value['imageUrl'];
+        imageUrl = snapshot.value['imageUrl'],
+        description = snapshot.value['description'];
 
   toJson() {
     return {
@@ -46,6 +49,7 @@ class House {
       'kitchen': kitchen,
       'date': date,
       'imageUrl': imageUrl,
+      'description': description,
     };
   }
 }

@@ -38,16 +38,16 @@ class _HomeState extends State<Home> {
         Map<dynamic, dynamic> values = snapshot.value;
         values.forEach((key, values) {
           house = new House(
-            amount: values['amount'],
-            address: values['address'],
-            bedrooms: values['bedrooms'],
-            bathrooms: values['bathrooms'],
-            squarefoot: values['squarefoot'],
-            garages: values['garages'],
-            kitchen: values['kitchen'],
-            date: values['date'],
-            imageUrl: values['imageUrl'],
-          );
+              amount: values['amount'],
+              address: values['address'],
+              bedrooms: values['bedrooms'],
+              bathrooms: values['bathrooms'],
+              squarefoot: values['squarefoot'],
+              garages: values['garages'],
+              kitchen: values['kitchen'],
+              date: values['date'],
+              imageUrl: values['imageUrl'],
+              description: values['description']);
           print(key);
           houseList.add(house);
         });

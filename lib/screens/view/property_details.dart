@@ -14,13 +14,7 @@ class PropertyDetails extends StatelessWidget {
     this.house,
     this.imgpathindex,
   );
-  final houseArray = [
-    "1.416",
-    "4",
-    "2",
-    "2",
-    "3",
-  ];
+
   final typeArray = [
     "Square foot",
     "Bedrooms",
@@ -31,6 +25,13 @@ class PropertyDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final houseArray = [
+      house.squarefoot,
+      house.bathrooms,
+      house.bedrooms,
+      house.garages,
+      house.kitchen
+    ];
     var screenWidth = MediaQuery.of(context).size.width;
     final oCcy = new NumberFormat("##,##,###", "en_INR");
     SystemChrome.setSystemUIOverlayStyle(
@@ -193,7 +194,7 @@ class PropertyDetails extends StatelessWidget {
                   bottom: 20,
                 ),
                 child: Text(
-                  "Walking distance ( 5 mins walk) to Galle Road, Wellawatte, Hospital Road, and Pamankada. VERY CONVENIENT LOCATION. Close to all amenities. There is a Keells Super down the road and a Cargills Food City in the road. Ideal for Residence or Commercial purpose",
+                  house.description.toString(),
                   textAlign: TextAlign.justify,
                   style: GoogleFonts.notoSans(
                     fontSize: 15,

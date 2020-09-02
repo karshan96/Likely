@@ -50,7 +50,8 @@ class _AddProductState extends State<AddProduct> {
           bathrooms: 0,
           kitchen: 0,
           garages: 0,
-          squarefoot: 0);
+          squarefoot: 0,
+          description: '');
       final FirebaseDatabase database = FirebaseDatabase.instance;
       houseRef = database.reference().child('houses');
       houseRef.onChildAdded.listen(_onEntryAdded);
@@ -304,6 +305,12 @@ class _AddProductState extends State<AddProduct> {
                     ),
                     Center(
                       child: (previewImage()),
+                    ),
+                    FormBuilderTextField(
+                      attribute: "description",
+                      initialValue: "",
+                      decoration: InputDecoration(labelText: "Description"),
+                      onChanged: (val) => house.description = val,
                     ),
                     SizedBox(
                       height: 12.0,
