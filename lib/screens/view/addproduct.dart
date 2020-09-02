@@ -43,7 +43,6 @@ class _AddProductState extends State<AddProduct> {
     super.initState();
     try {
       house = House(
-          key: '',
           amount: 0,
           address: '',
           date: '',
@@ -51,7 +50,7 @@ class _AddProductState extends State<AddProduct> {
           bathrooms: 0,
           kitchen: 0,
           garages: 0,
-          squarefoot: 0.0);
+          squarefoot: 0);
       final FirebaseDatabase database = FirebaseDatabase.instance;
       houseRef = database.reference().child('houses');
       houseRef.onChildAdded.listen(_onEntryAdded);
@@ -214,7 +213,7 @@ class _AddProductState extends State<AddProduct> {
                       attribute: "squarefoot",
                       initialValue: "",
                       decoration: InputDecoration(labelText: "Squarefoot"),
-                      onChanged: (val) => house.squarefoot = double.parse(val),
+                      onChanged: (val) => house.squarefoot = val,
                       // validators: [
                       //   FormBuilderValidators.numeric(),
                       //   FormBuilderValidators.max(70),

@@ -7,12 +7,10 @@ import 'package:Likely/models/data_model.dart';
 class ImageWidget extends StatelessWidget {
   final House house;
   final int imgpathindex;
-  final List<String> imageList;
 
   ImageWidget(
     this.house,
     this.imgpathindex,
-    this.imageList,
   );
 
   @override
@@ -31,7 +29,6 @@ class ImageWidget extends StatelessWidget {
                 builder: (context) => PropertyDetails(
                   this.house,
                   this.imgpathindex,
-                  this.imageList,
                 ),
               ),
             );
@@ -44,9 +41,7 @@ class ImageWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.0),
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: AssetImage(
-                  imageList[imgpathindex],
-                ),
+                image: NetworkImage(house.imageUrl),
               ),
             ),
           ),

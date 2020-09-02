@@ -2,8 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 
 class House {
   House(
-      {this.key,
-      this.amount,
+      {this.amount,
       this.address,
       this.bedrooms,
       this.bathrooms,
@@ -19,7 +18,7 @@ class House {
   int garages;
   int kitchen;
   String address;
-  double squarefoot;
+  int squarefoot;
   String key;
   String date;
   String imageUrl;

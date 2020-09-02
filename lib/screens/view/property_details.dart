@@ -1,4 +1,3 @@
-import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -10,12 +9,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class PropertyDetails extends StatelessWidget {
   final House house;
-  final List<String> imageList;
   final int imgpathindex;
   PropertyDetails(
     this.house,
     this.imgpathindex,
-    this.imageList,
   );
   final houseArray = [
     "1.416",
@@ -77,24 +74,8 @@ class PropertyDetails extends StatelessWidget {
                     child: SizedBox(
                       height: 200.0,
                       width: screenWidth,
-                      child: Carousel(
-                        images: [
-                          ExactAssetImage(imageList[imgpathindex]),
-                          ExactAssetImage(imageList[0]),
-                          ExactAssetImage(imageList[1]),
-                          ExactAssetImage(imageList[2]),
-                          ExactAssetImage(imageList[3]),
-                          ExactAssetImage(imageList[4]),
-                          ExactAssetImage(imageList[5]),
-                        ],
-                        showIndicator: true,
-                        borderRadius: false,
-                        moveIndicatorFromBottom: 180.0,
-                        noRadiusForIndicator: true,
-                        overlayShadow: false,
-                        overlayShadowColors: Colors.white,
-                        overlayShadowSize: 0.7,
-                      ),
+                      child:
+                          new Image.network(house.imageUrl, fit: BoxFit.cover),
                     ),
                   ),
                   Padding(
@@ -191,7 +172,7 @@ class PropertyDetails extends StatelessWidget {
                 child: ListView.builder(
                   shrinkWrap: false,
                   scrollDirection: Axis.horizontal,
-                  itemCount: houseArray.length,
+                  itemCount: typeArray.length,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 10),

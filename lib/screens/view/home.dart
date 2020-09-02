@@ -1,29 +1,66 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:Likely/common/constants.dart';
 import 'package:Likely/screens/custom_widgets/filter_widget.dart';
 import 'package:Likely/screens/custom_widgets/floating_widget.dart';
 import 'package:Likely/screens/custom_widgets/image_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:Likely/models/user.dart';
 import 'package:Likely/screens/view/addproduct.dart';
+import 'package:Likely/models/data_model.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 import 'package:Likely/screens/authenticate/register.dart';
 import 'package:Likely/screens/authenticate/signin.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
   final filterArray = [
     "<\$220.000",
     "For sale",
     "3-4 beds",
     "Kitchen",
   ];
+  static List<House> houseList = List();
+  House house;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      DatabaseReference db =
+          FirebaseDatabase.instance.reference().child("houses");
+      db.once().then((DataSnapshot snapshot) {
+        Map<dynamic, dynamic> values = snapshot.value;
+        values.forEach((key, values) {
+          house = new House(
+            amount: values['amount'],
+            address: values['address'],
+            bedrooms: values['bedrooms'],
+            bathrooms: values['bathrooms'],
+            squarefoot: values['squarefoot'],
+            garages: values['garages'],
+            kitchen: values['kitchen'],
+            date: values['date'],
+            imageUrl: values['imageUrl'],
+          );
+          print(key);
+          houseList.add(house);
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<User>(context);
-    var screenWidth = MediaQuery.of(context).size.width;
+    // var screenWidth = MediaQuery.of(context).size.width;
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
         statusBarColor: Colors.white,
@@ -135,14 +172,13 @@ class Home extends StatelessWidget {
               ),
               Column(
                 children: List.generate(
-                  Constants.houseList.length,
+                  houseList.length,
                   (index) {
                     return Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: ImageWidget(
-                        Constants.houseList[index],
+                        houseList[index],
                         index,
-                        Constants.imageList,
                       ),
                     );
                   },
