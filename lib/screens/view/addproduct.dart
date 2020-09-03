@@ -51,7 +51,8 @@ class _AddProductState extends State<AddProduct> {
           kitchen: 0,
           garages: 0,
           squarefoot: 0,
-          description: '');
+          description: '',
+          phone: '');
       final FirebaseDatabase database = FirebaseDatabase.instance;
       houseRef = database.reference().child('houses');
       houseRef.onChildAdded.listen(_onEntryAdded);
@@ -79,9 +80,12 @@ class _AddProductState extends State<AddProduct> {
   void handleSubmit(url) {
     try {
       house.imageUrl = url;
-      FormBuilderState form = formKey.currentState;
-      houseRef.push().set(house.toJson());
-      form.reset();
+      final FormBuilderState form = formKey.currentState;
+      if (form.validate()) {
+        form.save();
+        form.reset();
+        houseRef.push().set(house.toJson());
+      }
     } catch (e) {
       print(e);
     }
@@ -157,6 +161,7 @@ class _AddProductState extends State<AddProduct> {
                                   builder: (context) => Home(),
                                 ),
                               );
+                              Navigator.of(context).pop(false);
                             }),
                         MenuWidget(
                             iconImg: Icons.person,
@@ -169,6 +174,7 @@ class _AddProductState extends State<AddProduct> {
                                 context,
                                 MaterialPageRoute(builder: (context) => Home()),
                               );
+                              Navigator.of(context).pop(false);
                             })
                       ],
                     ),
@@ -188,8 +194,15 @@ class _AddProductState extends State<AddProduct> {
                       format: DateFormat("yyyy-MM-dd"),
                       decoration: InputDecoration(labelText: "Date"),
                       onChanged: (val) {
+                        print(val);
                         house.date = val.toString();
                       },
+                    ),
+                    FormBuilderTextField(
+                      attribute: "phone",
+                      initialValue: "",
+                      decoration: InputDecoration(labelText: "Contact Number"),
+                      onChanged: (val) => house.phone = val,
                     ),
                     FormBuilderTextField(
                       attribute: "address",
@@ -334,9 +347,9 @@ class _AddProductState extends State<AddProduct> {
                                   style: new TextStyle(
                                       fontSize: 20.0, color: Colors.white)),
                               onPressed: () {
-                                if (formKey.currentState.saveAndValidate()) {
-                                  uploadImage();
-                                }
+                                // if (formKey.currentState.saveAndValidate()) {
+                                uploadImage();
+                                // }
                               }),
                         )),
                     FlatButton(

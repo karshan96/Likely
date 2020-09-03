@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class FloatingWidget extends StatelessWidget {
   final IconData leadingIcon;
   final String txt;
+  final Function() onbtnTap;
   FloatingWidget({
     Key key,
     this.leadingIcon,
     this.txt,
+    this.onbtnTap,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -15,7 +17,9 @@ class FloatingWidget extends StatelessWidget {
       width: 150,
       child: FloatingActionButton(
         elevation: 5,
-        onPressed: () {},
+        onPressed: () {
+          onbtnTap();
+        },
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(75.0),
         ),

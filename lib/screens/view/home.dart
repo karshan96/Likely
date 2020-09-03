@@ -66,7 +66,8 @@ class _HomeState extends State<Home> {
               kitchen: values['kitchen'],
               date: values['date'],
               imageUrl: values['imageUrl'],
-              description: values['description']);
+              description: values['description'],
+              phone: values['phone']);
           print(key);
           houseList.add(house);
         });

@@ -6,31 +6,47 @@ import 'package:Likely/screens/custom_widgets/house_widget.dart';
 import 'package:Likely/screens/custom_widgets/menu_widget.dart';
 import 'package:Likely/models/data_model.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 
-class PropertyDetails extends StatelessWidget {
+class PropertyDetails extends StatefulWidget {
   final House house;
   final int imgpathindex;
   PropertyDetails(
     this.house,
     this.imgpathindex,
   );
+  @override
+  _PropertyDetailsState createState() => _PropertyDetailsState();
+}
+
+class _PropertyDetailsState extends State<PropertyDetails> {
+  Future<void> launched;
+  Future<void> makePhoneCall(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   final typeArray = [
     "Square foot",
     "Bedrooms",
-    "Bedrooms",
+    "Bathrooms",
     "Garage",
     "Kitchen",
   ];
 
   @override
   Widget build(BuildContext context) {
+    String phone = widget.house.phone;
     final houseArray = [
-      house.squarefoot,
-      house.bathrooms,
-      house.bedrooms,
-      house.garages,
-      house.kitchen
+      widget.house.squarefoot,
+      widget.house.bedrooms,
+      widget.house.bathrooms,
+      widget.house.garages,
+      widget.house.kitchen
     ];
     var screenWidth = MediaQuery.of(context).size.width;
     final oCcy = new NumberFormat("##,##,###", "en_INR");
@@ -54,10 +70,15 @@ class PropertyDetails extends StatelessWidget {
             FloatingWidget(
               leadingIcon: Icons.mail,
               txt: "Message",
+              onbtnTap: () {},
             ),
             FloatingWidget(
               leadingIcon: Icons.phone,
               txt: "Call",
+              onbtnTap: () => setState(() {
+                print(int.parse(widget.house.phone));
+                launched = makePhoneCall('tel:$phone');
+              }),
             ),
           ],
         ),
@@ -75,8 +96,8 @@ class PropertyDetails extends StatelessWidget {
                     child: SizedBox(
                       height: 200.0,
                       width: screenWidth,
-                      child:
-                          new Image.network(house.imageUrl, fit: BoxFit.cover),
+                      child: new Image.network(widget.house.imageUrl,
+                          fit: BoxFit.cover),
                     ),
                   ),
                   Padding(
@@ -109,7 +130,7 @@ class PropertyDetails extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '\$' + "${oCcy.format(house.amount)}",
+                          '\$' + "${oCcy.format(widget.house.amount)}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 25,
@@ -118,7 +139,7 @@ class PropertyDetails extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(top: 5),
                           child: Text(
-                            house.address,
+                            widget.house.address,
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey,
@@ -194,7 +215,7 @@ class PropertyDetails extends StatelessWidget {
                   bottom: 20,
                 ),
                 child: Text(
-                  house.description.toString(),
+                  widget.house.description.toString(),
                   textAlign: TextAlign.justify,
                   style: GoogleFonts.notoSans(
                     fontSize: 15,
