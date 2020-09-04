@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:Likely/services/auth.dart';
-import 'package:Likely/screens/custom_widgets/menu_widget.dart';
 import 'package:flutter/services.dart';
 
-class Register extends StatefulWidget {
+import 'package:Likely/screens/custom_widgets/menu_widget.dart';
+import 'package:Likely/screens/view/register.dart';
+
+class SignIn extends StatefulWidget {
   final Function toggleView;
-  Register({this.toggleView});
+  SignIn({this.toggleView});
 
   @override
-  _RegisterState createState() => _RegisterState();
+  _SignInState createState() => _SignInState();
 }
 
-class _RegisterState extends State<Register> {
+class _SignInState extends State<SignIn> {
   final AuthService _auth = AuthService();
 
-  final _formKey = GlobalKey<FormState>();
   String _email = '';
   String _password = '';
   String _error = '';
-
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +55,7 @@ class _RegisterState extends State<Register> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+                  padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
                   child: new TextFormField(
                     maxLines: 1,
                     keyboardType: TextInputType.emailAddress,
@@ -102,19 +103,19 @@ class _RegisterState extends State<Register> {
                           elevation: 5.0,
                           shape: new RoundedRectangleBorder(
                               borderRadius: new BorderRadius.circular(30.0)),
-                          color: Colors.red,
-                          child: new Text('Create an account',
+                          color: Colors.grey,
+                          child: new Text('Login',
                               // _isLoginForm ? 'Login' : 'Create account',
                               style: new TextStyle(
                                   fontSize: 20.0, color: Colors.white)),
                           onPressed: () async {
                             if (_formKey.currentState.validate()) {
                               dynamic result = await _auth
-                                  .registerWithEmailPassword(_email, _password);
+                                  .signWithEmailPassword(_email, _password);
                               Navigator.of(context).pop(false);
                               if (result == null) {
-                                setState(
-                                    () => _error = 'Please add valid Email');
+                                setState(() =>
+                                    _error = 'Could not sign in with this');
                               }
                             }
                           }
@@ -123,15 +124,38 @@ class _RegisterState extends State<Register> {
                     )),
                 FlatButton(
                     child: new Text(
-                      'LogIn',
+                      'Create a Account',
                       // _isLoginForm ? 'Create an account' : 'Have an account? Sign in',
                       // style: new TextStyle(
                       // fontSize: 18.0, fontWeight: FontWeight.w300)
                     ),
-                    onPressed: () => widget.toggleView()),
+                    onPressed: () {
+                      Navigator.of(context).pop(false);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Register()),
+                      );
+                    }),
               ],
             ),
           )),
     );
   }
 }
+
+// Widget showErrorMessage() {
+//   if (_errorMessage.length > 0 && _errorMessage != null) {
+//     return new Text(
+//       _errorMessage,
+//       style: TextStyle(
+//           fontSize: 13.0,
+//           color: Colors.red,
+//           height: 1.0,
+//           fontWeight: FontWeight.w300),
+//     );
+//   } else {
+//     return new Container(
+//       height: 0.0,
+//     );
+//   }
+// }

@@ -31,7 +31,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
   }
 
   final typeArray = [
-    "Square foot",
+    "Squarefoot",
     "Bedrooms",
     "Bathrooms",
     "Garage",
@@ -76,7 +76,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
               leadingIcon: Icons.phone,
               txt: "Call",
               onbtnTap: () => setState(() {
-                print(int.parse(widget.house.phone));
+                // print(int.parse(widget.house.phone));
                 launched = makePhoneCall('tel:$phone');
               }),
             ),
@@ -130,7 +130,7 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '\$' + "${oCcy.format(widget.house.amount)}",
+                          '\LKR ' + "${oCcy.format(widget.house.amount)}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 25,

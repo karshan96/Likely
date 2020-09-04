@@ -22,12 +22,13 @@ class AddProduct extends StatefulWidget {
 
 class _AddProductState extends State<AddProduct> {
   final AuthService _auth = AuthService();
-
   List<House> houses = List();
   House house;
   DatabaseReference houseRef;
 
   final GlobalKey<FormBuilderState> formKey = GlobalKey<FormBuilderState>();
+  StreamSubscription<Event> _onTodoAddedSubscription;
+  StreamSubscription<Event> _onTodoChangedSubscription;
   String _error = '';
   File sampleImage;
   String url = '';
@@ -55,11 +56,19 @@ class _AddProductState extends State<AddProduct> {
           phone: '');
       final FirebaseDatabase database = FirebaseDatabase.instance;
       houseRef = database.reference().child('houses');
-      houseRef.onChildAdded.listen(_onEntryAdded);
-      houseRef.onChildChanged.listen(_onEntryChanged);
+      _onTodoAddedSubscription = houseRef.onChildAdded.listen(_onEntryAdded);
+      _onTodoChangedSubscription =
+          houseRef.onChildChanged.listen(_onEntryChanged);
     } catch (e) {
       print(e);
     }
+  }
+
+  @override
+  void dispose() {
+    _onTodoAddedSubscription.cancel();
+    _onTodoChangedSubscription.cancel();
+    super.dispose();
   }
 
   _onEntryAdded(Event event) {
@@ -75,20 +84,6 @@ class _AddProductState extends State<AddProduct> {
     setState(() {
       houses[houses.indexOf(old)] = House.fromSnapshot(event.snapshot);
     });
-  }
-
-  void handleSubmit(url) {
-    try {
-      house.imageUrl = url;
-      final FormBuilderState form = formKey.currentState;
-      if (form.validate()) {
-        form.save();
-        form.reset();
-        houseRef.push().set(house.toJson());
-      }
-    } catch (e) {
-      print(e);
-    }
   }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
@@ -122,11 +117,26 @@ class _AddProductState extends State<AddProduct> {
         postImageRef.child(timeKey.toString() + '.jpg').putFile(sampleImage);
 
     var imageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
-    print(imageUrl);
+    // print(imageUrl);
 
     url = imageUrl;
 
     handleSubmit(url);
+  }
+
+  void handleSubmit(url) {
+    try {
+      house.imageUrl = url;
+      // final FormBuilderState form = formKey.currentState;
+      // print(house.toJson());
+      houseRef.push().set(house.toJson());
+      setState(() {
+        formKey.currentState.reset();
+        imageFile = null;
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -187,37 +197,44 @@ class _AddProductState extends State<AddProduct> {
                 child: Column(
                   children: <Widget>[
                     FormBuilderDateTimePicker(
-                      maxLines: 1,
-                      autofocus: false,
-                      attribute: "date",
-                      inputType: InputType.date,
-                      format: DateFormat("yyyy-MM-dd"),
-                      decoration: InputDecoration(labelText: "Date"),
-                      onChanged: (val) {
-                        print(val);
-                        house.date = val.toString();
-                      },
-                    ),
+                        maxLines: 1,
+                        autofocus: false,
+                        attribute: "date",
+                        inputType: InputType.date,
+                        format: DateFormat("yyyy-MM-dd"),
+                        decoration: InputDecoration(labelText: "Date"),
+                        onChanged: (val) {
+                          house.date = val.toString();
+                        },
+                        validators: [
+                          FormBuilderValidators.required(),
+                        ]),
                     FormBuilderTextField(
-                      attribute: "phone",
-                      initialValue: "",
-                      decoration: InputDecoration(labelText: "Contact Number"),
-                      onChanged: (val) => house.phone = val,
-                    ),
+                        attribute: "phone",
+                        initialValue: null,
+                        decoration:
+                            InputDecoration(labelText: "Contact Number"),
+                        onChanged: (val) => house.phone = val,
+                        validators: [
+                          FormBuilderValidators.required(),
+                        ]),
                     FormBuilderTextField(
-                      attribute: "address",
-                      initialValue: "",
-                      decoration: InputDecoration(labelText: "Address"),
-                      onChanged: (val) => house.address = val,
-                    ),
+                        attribute: "address",
+                        initialValue: null,
+                        decoration: InputDecoration(labelText: "Address"),
+                        onChanged: (val) => house.address = val,
+                        validators: [
+                          FormBuilderValidators.required(),
+                        ]),
                     FormBuilderTextField(
                       maxLines: 1,
                       autofocus: false,
                       attribute: "amount",
-                      initialValue: "",
+                      initialValue: null,
                       decoration: InputDecoration(labelText: "Amount"),
                       onChanged: (val) => house.amount = int.parse(val),
                       validators: [
+                        FormBuilderValidators.required(),
                         FormBuilderValidators.numeric(),
                       ],
                     ),
@@ -225,13 +242,13 @@ class _AddProductState extends State<AddProduct> {
                       maxLines: 1,
                       autofocus: false,
                       attribute: "squarefoot",
-                      initialValue: "",
+                      initialValue: null,
                       decoration: InputDecoration(labelText: "Squarefoot"),
                       onChanged: (val) => house.squarefoot = int.parse(val),
-                      // validators: [
-                      //   FormBuilderValidators.numeric(),
-                      //   FormBuilderValidators.max(70),
-                      // ],
+                      validators: [
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.numeric(),
+                      ],
                     ),
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -243,7 +260,6 @@ class _AddProductState extends State<AddProduct> {
                             attribute: "bedrooms",
                             decoration: InputDecoration(labelText: "Bedrooms"),
                             onChanged: (val) => house.bedrooms = val,
-                            // initialValue: 'Male',
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
                             items: [0, 1, 2, 3, 4, 5, 6]
@@ -258,7 +274,6 @@ class _AddProductState extends State<AddProduct> {
                             attribute: "bathrooms",
                             decoration: InputDecoration(labelText: "Bathrooms"),
                             onChanged: (val) => house.bathrooms = val,
-                            // initialValue: 'Male',
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
                             items: [0, 1, 2, 3, 4, 5, 6]
@@ -321,9 +336,12 @@ class _AddProductState extends State<AddProduct> {
                     ),
                     FormBuilderTextField(
                       attribute: "description",
-                      initialValue: "",
+                      initialValue: null,
                       decoration: InputDecoration(labelText: "Description"),
                       onChanged: (val) => house.description = val,
+                      validators: [
+                        FormBuilderValidators.required(),
+                      ],
                     ),
                     SizedBox(
                       height: 12.0,
@@ -347,9 +365,9 @@ class _AddProductState extends State<AddProduct> {
                                   style: new TextStyle(
                                       fontSize: 20.0, color: Colors.white)),
                               onPressed: () {
-                                // if (formKey.currentState.saveAndValidate()) {
-                                uploadImage();
-                                // }
+                                if (formKey.currentState.saveAndValidate()) {
+                                  uploadImage();
+                                }
                               }),
                         )),
                     FlatButton(
@@ -373,7 +391,7 @@ class _AddProductState extends State<AddProduct> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text('Add Image'),
+            title: Text('Add Photo'),
             actions: <Widget>[
               FlatButton(
                 child: const Text('CANCEL'),

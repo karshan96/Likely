@@ -10,8 +10,8 @@ import 'package:Likely/screens/view/addproduct.dart';
 import 'package:Likely/models/data_model.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-import 'package:Likely/screens/authenticate/register.dart';
-import 'package:Likely/screens/authenticate/signin.dart';
+import 'package:Likely/screens/view/register.dart';
+import 'package:Likely/screens/view/signin.dart';
 import 'dart:async';
 
 class Debouncer {
@@ -68,11 +68,13 @@ class _HomeState extends State<Home> {
               imageUrl: values['imageUrl'],
               description: values['description'],
               phone: values['phone']);
-          print(key);
+          // print(key);
           houseList.add(house);
+          // filteredHouses = houseList;
         });
       });
       setState(() {
+        // print(houseList.length);
         filteredHouses = houseList;
       });
     } catch (e) {
@@ -96,61 +98,59 @@ class _HomeState extends State<Home> {
         txt: "Map view",
       ),
       appBar: AppBar(
-        backgroundColor: Colors.white,
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset('assets/images/title.jpg',
+            Image.asset('assets/images/title1.jpg',
                 fit: BoxFit.cover, height: 32),
-            Text("Likely", style: TextStyle(color: Colors.green)),
-            FlatButton(
-                child: Text('Login'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SignIn(),
-                    ),
-                  );
-                },
-                textColor: Colors.black),
-            FlatButton(
-                child: Text('Register'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Register()),
-                  );
-                },
-                textColor: Colors.black),
-            FlatButton(
-                child: Text('Post Your Ad'),
-                onPressed: () {
-                  if (user == null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignIn()),
-                    );
-                  } else {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => AddProduct()),
-                    );
-                  }
-                },
-                color: Colors.orange,
-                textColor: Colors.white)
+            Text("Likely", style: TextStyle(color: Colors.black)),
           ],
         ),
-        centerTitle: true,
-        elevation: 0.0,
+        actions: <Widget>[
+          FlatButton(
+              child: Text('Login'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SignIn(),
+                  ),
+                );
+              },
+              textColor: Colors.grey),
+          FlatButton(
+              child: Text('Register'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Register()),
+                );
+              },
+              textColor: Colors.grey),
+          FlatButton(
+              child: Text('Post Your Ad'),
+              onPressed: () {
+                if (user == null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignIn()),
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddProduct()),
+                  );
+                }
+              },
+              color: Colors.grey,
+              textColor: Colors.white)
+        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(
             left: 15,
             right: 15,
-            top: 35,
+            top: 15,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +158,7 @@ class _HomeState extends State<Home> {
               Text(
                 "City",
                 style: GoogleFonts.notoSans(
-                  fontSize: 12,
+                  fontSize: 13,
                   color: Colors.grey,
                 ),
               ),
