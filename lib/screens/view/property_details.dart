@@ -22,7 +22,7 @@ class PropertyDetails extends StatefulWidget {
 
 class _PropertyDetailsState extends State<PropertyDetails> {
   Future<void> launched;
-  Future<void> makePhoneCall(String url) async {
+  Future<void> mackeLaunch(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
@@ -70,14 +70,16 @@ class _PropertyDetailsState extends State<PropertyDetails> {
             FloatingWidget(
               leadingIcon: Icons.mail,
               txt: "Message",
-              onbtnTap: () {},
+              onbtnTap: () => setState(() {
+                launched = mackeLaunch('sms:$phone');
+              }),
             ),
             FloatingWidget(
               leadingIcon: Icons.phone,
               txt: "Call",
               onbtnTap: () => setState(() {
                 // print(int.parse(widget.house.phone));
-                launched = makePhoneCall('tel:$phone');
+                launched = mackeLaunch('tel:$phone');
               }),
             ),
           ],
