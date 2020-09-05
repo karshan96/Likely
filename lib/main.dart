@@ -1,3 +1,4 @@
+import 'package:Likely/screens/view/home.dart';
 import 'package:flutter/material.dart';
 import 'package:Likely/screens/wapper.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,9 @@ class MyApp extends StatelessWidget {
             // visualDensity: VisualDensity.adaptivePlatformDensity,
           ),
           home: Wapper(),
+          routes: {
+            "/home": (_) => new Home(),
+          },
         ));
   }
 }

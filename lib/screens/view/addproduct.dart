@@ -55,6 +55,8 @@ class _AddProductState extends State<AddProduct> {
           description: '',
           phone: '');
       final FirebaseDatabase database = FirebaseDatabase.instance;
+      database.setPersistenceEnabled(true);
+      database.setPersistenceCacheSizeBytes(10000000);
       houseRef = database.reference().child('houses');
       _onTodoAddedSubscription = houseRef.onChildAdded.listen(_onEntryAdded);
       _onTodoChangedSubscription =
@@ -130,10 +132,16 @@ class _AddProductState extends State<AddProduct> {
       // final FormBuilderState form = formKey.currentState;
       // print(house.toJson());
       houseRef.push().set(house.toJson());
-      setState(() {
-        formKey.currentState.reset();
-        imageFile = null;
-      });
+      formKey.currentState.reset();
+      imageFile = null;
+      Navigator.of(context).pop(false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(),
+        ),
+      );
+      Navigator.of(context).pop(false);
     } catch (e) {
       print(e);
     }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:Likely/screens/custom_widgets/filter_widget.dart';
-import 'package:Likely/screens/custom_widgets/floating_widget.dart';
 import 'package:Likely/screens/custom_widgets/image_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:Likely/models/user.dart';
@@ -45,37 +44,37 @@ class _HomeState extends State<Home> {
   House house;
   List<House> filteredHouses = List();
   final debouncer = Debouncer(milliseconds: 500);
+  DatabaseReference db;
+  FirebaseDatabase database;
 
   @override
   void initState() {
     super.initState();
     try {
-      DatabaseReference db =
-          FirebaseDatabase.instance.reference().child("houses");
+      db = FirebaseDatabase.instance.reference().child("houses");
+      db.keepSynced(true);
       db.once().then((DataSnapshot snapshot) {
-        Map<dynamic, dynamic> values = snapshot.value;
-        houseList.clear();
-        values.forEach((key, values) {
-          house = new House(
-              amount: values['amount'],
-              address: values['address'],
-              bedrooms: values['bedrooms'],
-              bathrooms: values['bathrooms'],
-              squarefoot: values['squarefoot'],
-              garages: values['garages'],
-              kitchen: values['kitchen'],
-              date: values['date'],
-              imageUrl: values['imageUrl'],
-              description: values['description'],
-              phone: values['phone']);
-          // print(key);
-          houseList.add(house);
-          // filteredHouses = houseList;
+        setState(() {
+          Map<dynamic, dynamic> values = snapshot.value;
+          houseList.clear();
+          values.forEach((key, values) {
+            house = new House(
+                amount: values['amount'],
+                address: values['address'],
+                bedrooms: values['bedrooms'],
+                bathrooms: values['bathrooms'],
+                squarefoot: values['squarefoot'],
+                garages: values['garages'],
+                kitchen: values['kitchen'],
+                date: values['date'],
+                imageUrl: values['imageUrl'],
+                description: values['description'],
+                phone: values['phone']);
+            // print(key);
+            houseList.add(house);
+            filteredHouses = houseList;
+          });
         });
-      });
-      setState(() {
-        // print(houseList.length);
-        filteredHouses = houseList;
       });
     } catch (e) {
       print(e);
@@ -93,21 +92,34 @@ class _HomeState extends State<Home> {
     );
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingWidget(
-        leadingIcon: Icons.explore,
-        txt: "Map view",
-      ),
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        toolbarHeight: 72,
         title: Row(
           children: <Widget>[
-            Image.asset('assets/images/title1.jpg',
-                fit: BoxFit.cover, height: 32),
-            Text("Likely", style: TextStyle(color: Colors.black)),
+            FlatButton.icon(
+              padding: const EdgeInsets.only(
+                right: 0.01,
+              ),
+              onPressed: () {
+                // Navigator.of(context).pop(false);
+                Navigator.pushReplacementNamed(context, "/home");
+              },
+              icon: Image.asset('assets/images/title1.jpg',
+                  fit: BoxFit.cover,
+                  height: 39,
+                  alignment: Alignment.centerRight),
+              label: Text(
+                "Likely",
+                style: TextStyle(color: Colors.black, fontSize: 14.5),
+              ),
+            ),
           ],
         ),
         actions: <Widget>[
           FlatButton(
               child: Text('Login'),
+              padding: EdgeInsets.all(2.0),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -119,6 +131,7 @@ class _HomeState extends State<Home> {
               textColor: Colors.grey),
           FlatButton(
               child: Text('Register'),
+              padding: EdgeInsets.all(2.0),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -128,6 +141,7 @@ class _HomeState extends State<Home> {
               textColor: Colors.grey),
           FlatButton(
               child: Text('Post Your Ad'),
+              padding: EdgeInsets.all(10.0),
               onPressed: () {
                 if (user == null) {
                   Navigator.push(
@@ -158,7 +172,7 @@ class _HomeState extends State<Home> {
               Text(
                 "City",
                 style: GoogleFonts.notoSans(
-                  fontSize: 13,
+                  fontSize: 16,
                   color: Colors.grey,
                 ),
               ),
