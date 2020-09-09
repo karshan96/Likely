@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:Likely/services/auth.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'dart:async';
 import 'dart:io';
@@ -25,10 +26,11 @@ class _AddProductState extends State<AddProduct> {
   List<House> houses = List();
   House house;
   DatabaseReference houseRef;
+  final firestoreInstance = Firestore.instance;
 
   final GlobalKey<FormBuilderState> formKey = GlobalKey<FormBuilderState>();
-  StreamSubscription<Event> _onTodoAddedSubscription;
-  StreamSubscription<Event> _onTodoChangedSubscription;
+  // StreamSubscription<Event> _onTodoAddedSubscription;
+  // StreamSubscription<Event> _onTodoChangedSubscription;
   String _error = '';
   File sampleImage;
   String url = '';
@@ -54,39 +56,39 @@ class _AddProductState extends State<AddProduct> {
           squarefoot: 0,
           description: '',
           phone: '');
-      final FirebaseDatabase database = FirebaseDatabase.instance;
-      database.setPersistenceEnabled(true);
-      database.setPersistenceCacheSizeBytes(10000000);
-      houseRef = database.reference().child('houses');
-      _onTodoAddedSubscription = houseRef.onChildAdded.listen(_onEntryAdded);
-      _onTodoChangedSubscription =
-          houseRef.onChildChanged.listen(_onEntryChanged);
+      // final FirebaseDatabase database = FirebaseDatabase.instance;
+      // database.setPersistenceEnabled(true);
+      // database.setPersistenceCacheSizeBytes(10000000);
+      // houseRef = database.reference().child('houses');
+      // _onTodoAddedSubscription = houseRef.onChildAdded.listen(_onEntryAdded);
+      // _onTodoChangedSubscription =
+      //     houseRef.onChildChanged.listen(_onEntryChanged);
     } catch (e) {
       print(e);
     }
   }
 
-  @override
-  void dispose() {
-    _onTodoAddedSubscription.cancel();
-    _onTodoChangedSubscription.cancel();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _onTodoAddedSubscription.cancel();
+  //   _onTodoChangedSubscription.cancel();
+  //   super.dispose();
+  // }
 
-  _onEntryAdded(Event event) {
-    setState(() {
-      houses.add(House.fromSnapshot(event.snapshot));
-    });
-  }
+  // _onEntryAdded(Event event) {
+  //   setState(() {
+  //     houses.add(House.fromSnapshot(event.snapshot));
+  //   });
+  // }
 
-  _onEntryChanged(Event event) {
-    var old = houses.singleWhere((entry) {
-      return entry.key == event.snapshot.key;
-    });
-    setState(() {
-      houses[houses.indexOf(old)] = House.fromSnapshot(event.snapshot);
-    });
-  }
+  // _onEntryChanged(Event event) {
+  //   var old = houses.singleWhere((entry) {
+  //     return entry.key == event.snapshot.key;
+  //   });
+  //   setState(() {
+  //     houses[houses.indexOf(old)] = House.fromSnapshot(event.snapshot);
+  //   });
+  // }
 
   void _onImageButtonPressed(ImageSource source, {BuildContext context}) async {
     await _displayPickImageDialog(context,
@@ -131,16 +133,19 @@ class _AddProductState extends State<AddProduct> {
       house.imageUrl = url;
       // final FormBuilderState form = formKey.currentState;
       // print(house.toJson());
-      houseRef.push().set(house.toJson());
+      // houseRef.push().set(house.toJson());
+      firestoreInstance.collection("houses").add(house.toJson()).then((value) {
+        print(value.documentID);
+      });
       formKey.currentState.reset();
       imageFile = null;
-      Navigator.of(context).pop(false);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Home(),
-        ),
-      );
+      // Navigator.of(context).pop(false);
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => Home(),
+      //   ),
+      // );
       Navigator.of(context).pop(false);
     } catch (e) {
       print(e);

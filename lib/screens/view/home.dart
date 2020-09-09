@@ -12,6 +12,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:Likely/screens/view/register.dart';
 import 'package:Likely/screens/view/signin.dart';
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Debouncer {
   final int milliseconds;
@@ -46,36 +47,62 @@ class _HomeState extends State<Home> {
   final debouncer = Debouncer(milliseconds: 500);
   DatabaseReference db;
   FirebaseDatabase database;
+  final firestoreInstance = Firestore.instance;
 
   @override
   void initState() {
     super.initState();
     try {
-      db = FirebaseDatabase.instance.reference().child("houses");
-      db.keepSynced(true);
-      db.once().then((DataSnapshot snapshot) {
+      houseList.clear();
+      firestoreInstance
+          .collection("houses")
+          .getDocuments()
+          .then((querySnapshot) {
         setState(() {
-          Map<dynamic, dynamic> values = snapshot.value;
-          houseList.clear();
-          values.forEach((key, values) {
+          querySnapshot.documents.forEach((result) {
             house = new House(
-                amount: values['amount'],
-                address: values['address'],
-                bedrooms: values['bedrooms'],
-                bathrooms: values['bathrooms'],
-                squarefoot: values['squarefoot'],
-                garages: values['garages'],
-                kitchen: values['kitchen'],
-                date: values['date'],
-                imageUrl: values['imageUrl'],
-                description: values['description'],
-                phone: values['phone']);
+                amount: result['amount'],
+                address: result['address'],
+                bedrooms: result['bedrooms'],
+                bathrooms: result['bathrooms'],
+                squarefoot: result['squarefoot'],
+                garages: result['garages'],
+                kitchen: result['kitchen'],
+                date: result['date'],
+                imageUrl: result['imageUrl'],
+                description: result['description'],
+                phone: result['phone']);
             // print(key);
             houseList.add(house);
             filteredHouses = houseList;
           });
         });
       });
+      // db = FirebaseDatabase.instance.reference().child("houses");
+      // db.keepSynced(true);
+      // db.once().then((DataSnapshot snapshot) {
+      //   setState(() {
+      //     Map<dynamic, dynamic> values = snapshot.value;
+      //     houseList.clear();
+      //     values.forEach((key, values) {
+      //       house = new House(
+      //           amount: values['amount'],
+      //           address: values['address'],
+      //           bedrooms: values['bedrooms'],
+      //           bathrooms: values['bathrooms'],
+      //           squarefoot: values['squarefoot'],
+      //           garages: values['garages'],
+      //           kitchen: values['kitchen'],
+      //           date: values['date'],
+      //           imageUrl: values['imageUrl'],
+      //           description: values['description'],
+      //           phone: values['phone']);
+      //       // print(key);
+      //       houseList.add(house);
+      //       filteredHouses = houseList;
+      //     });
+      //   });
+      // });
     } catch (e) {
       print(e);
     }
