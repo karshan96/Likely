@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:Likely/screens/custom_widgets/filter_widget.dart';
+// import 'package:Likely/screens/custom_widgets/filter_widget.dart';
 import 'package:Likely/screens/custom_widgets/image_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:Likely/models/user.dart';
@@ -35,12 +35,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final filterArray = [
-    "<\$220.000",
-    "For sale",
-    "3-4 beds",
-    "Kitchen",
-  ];
   static List<House> houseList = List();
   House house;
   List<House> filteredHouses = List();
@@ -217,13 +211,13 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 style: TextStyle(fontSize: 24),
-                onChanged: (string) {
+                onChanged: (area) {
                   debouncer.run(() {
                     setState(() {
                       filteredHouses = houseList
                           .where((u) => (u.address
                               .toLowerCase()
-                              .contains(string.toLowerCase())))
+                              .contains(area.toLowerCase())))
                           .toList();
                     });
                   });
@@ -235,16 +229,120 @@ class _HomeState extends State<Home> {
               ),
               Container(
                 height: 50,
-                child: ListView.builder(
-                  shrinkWrap: false,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: filterArray.length,
-                  itemBuilder: (context, index) {
-                    return FilterWidget(
-                      filterTxt: filterArray[index],
-                    );
-                  },
-                ),
+                child: ListView(
+                    shrinkWrap: false,
+                    scrollDirection: Axis.horizontal,
+                    children: <Widget>[
+                      Container(
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(40.0),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 5,
+                              right: 5,
+                            ),
+                            child: new FlatButton(
+                              child: new Text(
+                                '<LKR 5,000,000',
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              onPressed: () {
+                                debouncer.run(() {
+                                  setState(() {
+                                    filteredHouses = houseList
+                                        .where((u) => u.amount <= 5000000)
+                                        .toList();
+                                  });
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(40.0),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 5,
+                              right: 5,
+                            ),
+                            child: new FlatButton(
+                              child: new Text(
+                                'Bedrooms 3-4',
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              onPressed: () {
+                                debouncer.run(() {
+                                  setState(() {
+                                    filteredHouses = houseList
+                                        .where((u) =>
+                                            u.bedrooms >= 3 && u.bedrooms <= 4)
+                                        .toList();
+                                  });
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Container(
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: Colors.black12,
+                          borderRadius: BorderRadius.circular(40.0),
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 5,
+                              right: 5,
+                            ),
+                            child: new FlatButton(
+                              child: new Text(
+                                'Garage',
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              onPressed: () {
+                                debouncer.run(() {
+                                  setState(() {
+                                    filteredHouses = houseList
+                                        .where((u) => u.garages > 0)
+                                        .toList();
+                                  });
+                                });
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
               ),
               SizedBox(
                 height: 10,
