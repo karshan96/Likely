@@ -55,7 +55,67 @@ class _SignInState extends State<SignIn> {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 50.0, 0.0, 0.0),
+                  padding: EdgeInsets.only(top: 45),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: 240,
+                    child: Stack(
+                      children: <Widget>[
+                        Positioned(
+                            child: Container(
+                          child: Align(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle, color: Colors.grey),
+                              width: 150,
+                              height: 150,
+                            ),
+                            alignment: Alignment.center,
+                          ),
+                          height: 154,
+                        )),
+                        Positioned(
+                          child: Container(
+                              height: 154,
+                              width: MediaQuery.of(context).size.width,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "LIKELY",
+                                  style: TextStyle(
+                                    fontSize: 40,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )),
+                        ),
+                        Positioned(
+                          width: 60,
+                          height: 60,
+                          top: 140,
+                          left: 260,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.grey),
+                          ),
+                        ),
+                        Positioned(
+                          width: 30,
+                          height: 30,
+                          top: 200,
+                          left: 230,
+                          child: Container(
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0.0, 30.0, 0.0, 0.0),
                   child: new TextFormField(
                     maxLines: 1,
                     keyboardType: TextInputType.emailAddress,
@@ -72,7 +132,7 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 0.0),
+                  padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                   child: new TextFormField(
                     maxLines: 1,
                     obscureText: true,
@@ -101,8 +161,8 @@ class _SignInState extends State<SignIn> {
                       height: 40.0,
                       child: new RaisedButton(
                           elevation: 5.0,
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(30.0)),
+                          // shape: new RoundedRectangleBorder(
+                          //     borderRadius: new BorderRadius.circular(30.0)),
                           color: Colors.grey,
                           child: new Text('Login',
                               // _isLoginForm ? 'Login' : 'Create account',
