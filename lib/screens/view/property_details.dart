@@ -40,6 +40,15 @@ class _PropertyDetailsState extends State<PropertyDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final today = new DateTime.now();
+    final hDifference =
+        today.difference(DateTime.parse(widget.house.date)).inHours;
+    final dDifference =
+        today.difference(DateTime.parse(widget.house.date)).inDays;
+    final mDifference =
+        today.difference(DateTime.parse(widget.house.date)).inMinutes;
+    final sDifference =
+        today.difference(DateTime.parse(widget.house.date)).inSeconds;
     String phone = widget.house.phone;
     final houseArray = [
       widget.house.squarefoot,
@@ -163,7 +172,26 @@ class _PropertyDetailsState extends State<PropertyDetails> {
                         ),
                         child: Center(
                           child: Text(
-                            "20 hours ago",
+                            sDifference >= 60
+                                ? mDifference >= 60
+                                    ? hDifference >= 24
+                                        ? dDifference > 1
+                                            ? dDifference.toString() +
+                                                ' Days ago'
+                                            : dDifference.toString() +
+                                                ' Day ago'
+                                        : hDifference > 1
+                                            ? hDifference.toString() +
+                                                ' Hours ago'
+                                            : hDifference.toString() +
+                                                ' Hour ago'
+                                    : mDifference > 1
+                                        ? mDifference.toString() +
+                                            ' Minutes ago'
+                                        : mDifference.toString() + ' Minute ago'
+                                : sDifference > 1
+                                    ? sDifference.toString() + ' Seconds ago'
+                                    : sDifference.toString() + ' Second ago',
                             style: Theme.of(context).textTheme.caption.copyWith(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
