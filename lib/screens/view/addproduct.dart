@@ -1,7 +1,5 @@
 import 'package:Likely/models/data_model.dart';
 import 'package:Likely/screens/view/home.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:Likely/screens/custom_widgets/menu_widget.dart';
@@ -10,9 +8,17 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:Likely/services/auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:image_picker_web/image_picker_web.dart';
+// import 'package:firebase/firebase.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:path/path.dart';
 
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
+// import 'dart:html';
+
+// import 'package:mime_type/mime_type.dart';
 
 import '../../services/auth.dart';
 
@@ -25,15 +31,17 @@ class _AddProductState extends State<AddProduct> {
   final AuthService _auth = AuthService();
   List<House> houses = List();
   House house;
-  DatabaseReference houseRef;
+  // DatabaseReference houseRef;
   final firestoreInstance = Firestore.instance;
 
   final GlobalKey<FormBuilderState> formKey = GlobalKey<FormBuilderState>();
   // StreamSubscription<Event> _onTodoAddedSubscription;
   // StreamSubscription<Event> _onTodoChangedSubscription;
   String _error = '';
-  File sampleImage;
   String url = '';
+  var imageUri;
+  var mediaInfo;
+  io.File sampleImage;
 
   PickedFile imageFile;
   dynamic pickImageError;
@@ -48,7 +56,7 @@ class _AddProductState extends State<AddProduct> {
       house = House(
           amount: 0,
           address: '',
-          date: '',
+          date: DateTime.now().toString(),
           bedrooms: 0,
           bathrooms: 0,
           kitchen: 0,
@@ -110,6 +118,46 @@ class _AddProductState extends State<AddProduct> {
       }
     });
   }
+  // imagePicker() async {
+  //   mediaInfo = await ImagePickerWeb.getImageInfo;
+
+  //   window.console.info(mediaInfo);
+  // }
+
+  // uploadFile(MediaInfo mediaInfo, String ref, String fileName) {
+  //   try {
+  //     String mimeType = mime(basename(mediaInfo.fileName));
+  //     var metaData = UploadMetadata(contentType: mimeType);
+  //     StorageReference storageReference = storage().ref(ref).child(fileName);
+
+  //     UploadTask uploadTask = storageReference.put(mediaInfo.data, metaData);
+  //     uploadTask.future.then((snapshot) => {
+  //           Future.delayed(Duration(seconds: 1)).then((value) => {
+  //                 snapshot.ref.getDownloadURL().then((dynamic uri) {
+  //                   imageUri = uri;
+  //                   window.console.info('Download URL: ${imageUri.toString()}');
+  //                   handleSubmit(imageUri);
+  //                 })
+  //               })
+  //         });
+  //   } catch (e) {
+  //     print('File Upload Error: $e');
+  //   }
+  // }
+
+  Future<void> retrieveLostData() async {
+    final LostData response = await _picker.getLostData();
+    if (response.isEmpty) {
+      return;
+    }
+    if (response.file != null) {
+      setState(() {
+        imageFile = response.file;
+      });
+    } else {
+      _retrieveDataError = response.exception.code;
+    }
+  }
 
   void uploadImage() async {
     final StorageReference postImageRef =
@@ -121,31 +169,34 @@ class _AddProductState extends State<AddProduct> {
         postImageRef.child(timeKey.toString() + '.jpg').putFile(sampleImage);
 
     var imageUrl = await (await uploadTask.onComplete).ref.getDownloadURL();
-    // print(imageUrl);
+    print(imageUrl);
 
-    url = imageUrl;
+    url = imageUrl.toString();
+    // window.console.info(url);
 
     handleSubmit(url);
   }
 
   void handleSubmit(url) {
     try {
-      house.imageUrl = url;
+      // window.console.info(url.toString());
+      house.imageUrl = url.toString();
       // final FormBuilderState form = formKey.currentState;
       // print(house.toJson());
       // houseRef.push().set(house.toJson());
       firestoreInstance.collection("houses").add(house.toJson()).then((value) {
-        print(value.documentID);
+        // window.console.info(url);
+        // print(value.documentID);
       });
       formKey.currentState.reset();
       imageFile = null;
-      // Navigator.of(context).pop(false);
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => Home(),
-      //   ),
-      // );
+      Navigator.of(context).pop(false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Home(),
+        ),
+      );
       Navigator.of(context).pop(false);
     } catch (e) {
       print(e);
@@ -204,6 +255,13 @@ class _AddProductState extends State<AddProduct> {
                   )
                 ],
               ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 15,
+                  right: 15,
+                  left: 15,
+                ),
+              ),
               FormBuilder(
                 key: formKey,
                 autovalidate: true,
@@ -215,9 +273,16 @@ class _AddProductState extends State<AddProduct> {
                         attribute: "date",
                         inputType: InputType.date,
                         format: DateFormat("yyyy-MM-dd"),
-                        decoration: InputDecoration(labelText: "Date"),
+                        decoration: InputDecoration(
+                          labelText: "Date",
+                          icon: new Icon(
+                            Icons.date_range,
+                            color: Colors.grey,
+                          ),
+                          // border: InputBorder.none,
+                        ),
                         onChanged: (val) {
-                          house.date = val.toString();
+                          // house.date = val.toString();
                         },
                         validators: [
                           FormBuilderValidators.required(),
@@ -225,8 +290,14 @@ class _AddProductState extends State<AddProduct> {
                     FormBuilderTextField(
                         attribute: "phone",
                         initialValue: null,
-                        decoration:
-                            InputDecoration(labelText: "Contact Number"),
+                        decoration: InputDecoration(
+                          labelText: "Contact Number",
+                          icon: new Icon(
+                            Icons.phone,
+                            color: Colors.grey,
+                          ),
+                          // border: InputBorder.none,
+                        ),
                         onChanged: (val) => house.phone = val,
                         validators: [
                           FormBuilderValidators.required(),
@@ -234,7 +305,14 @@ class _AddProductState extends State<AddProduct> {
                     FormBuilderTextField(
                         attribute: "address",
                         initialValue: null,
-                        decoration: InputDecoration(labelText: "Address"),
+                        decoration: InputDecoration(
+                          labelText: "Address",
+                          icon: new Icon(
+                            Icons.house,
+                            color: Colors.grey,
+                          ),
+                          // border: InputBorder.none,
+                        ),
                         onChanged: (val) => house.address = val,
                         validators: [
                           FormBuilderValidators.required(),
@@ -244,7 +322,14 @@ class _AddProductState extends State<AddProduct> {
                       autofocus: false,
                       attribute: "amount",
                       initialValue: null,
-                      decoration: InputDecoration(labelText: "Amount"),
+                      decoration: InputDecoration(
+                        labelText: "Amount",
+                        icon: new Icon(
+                          Icons.attach_money,
+                          color: Colors.grey,
+                        ),
+                        // border: InputBorder.none,
+                      ),
                       onChanged: (val) => house.amount = int.parse(val),
                       validators: [
                         FormBuilderValidators.required(),
@@ -256,7 +341,14 @@ class _AddProductState extends State<AddProduct> {
                       autofocus: false,
                       attribute: "squarefoot",
                       initialValue: null,
-                      decoration: InputDecoration(labelText: "Squarefoot"),
+                      decoration: InputDecoration(
+                        labelText: "Squarefoot",
+                        icon: new Icon(
+                          Icons.square_foot,
+                          color: Colors.grey,
+                        ),
+                        // border: InputBorder.none,
+                      ),
                       onChanged: (val) => house.squarefoot = int.parse(val),
                       validators: [
                         FormBuilderValidators.required(),
@@ -271,7 +363,14 @@ class _AddProductState extends State<AddProduct> {
                           child: FormBuilderDropdown(
                             autofocus: false,
                             attribute: "bedrooms",
-                            decoration: InputDecoration(labelText: "Bedrooms"),
+                            decoration: InputDecoration(
+                              labelText: "Bedrooms",
+                              icon: new Icon(
+                                Icons.room,
+                                color: Colors.grey,
+                              ),
+                              // border: InputBorder.none,
+                            ),
                             onChanged: (val) => house.bedrooms = val,
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
@@ -285,7 +384,14 @@ class _AddProductState extends State<AddProduct> {
                           child: FormBuilderDropdown(
                             autofocus: false,
                             attribute: "bathrooms",
-                            decoration: InputDecoration(labelText: "Bathrooms"),
+                            decoration: InputDecoration(
+                              labelText: "Bathrooms",
+                              icon: new Icon(
+                                Icons.room,
+                                color: Colors.grey,
+                              ),
+                              // border: InputBorder.none,
+                            ),
                             onChanged: (val) => house.bathrooms = val,
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
@@ -306,7 +412,14 @@ class _AddProductState extends State<AddProduct> {
                           child: FormBuilderDropdown(
                             autofocus: false,
                             attribute: "kitchen",
-                            decoration: InputDecoration(labelText: "Kitchen"),
+                            decoration: InputDecoration(
+                              labelText: "Kitchen",
+                              icon: new Icon(
+                                Icons.room,
+                                color: Colors.grey,
+                              ),
+                              // border: InputBorder.none,
+                            ),
                             onChanged: (val) => house.kitchen = val,
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
@@ -320,7 +433,14 @@ class _AddProductState extends State<AddProduct> {
                           child: FormBuilderDropdown(
                             autofocus: false,
                             attribute: "garages",
-                            decoration: InputDecoration(labelText: "Garages"),
+                            decoration: InputDecoration(
+                              labelText: "Garages",
+                              icon: new Icon(
+                                Icons.room,
+                                color: Colors.grey,
+                              ),
+                              // border: InputBorder.none,
+                            ),
                             onChanged: (val) => house.garages = val,
                             hint: Text('-'),
                             validators: [FormBuilderValidators.required()],
@@ -337,6 +457,7 @@ class _AddProductState extends State<AddProduct> {
                     ),
                     FloatingActionButton(
                       onPressed: () {
+                        // imagePicker();
                         _onImageButtonPressed(ImageSource.gallery,
                             context: context);
                       },
@@ -345,12 +466,49 @@ class _AddProductState extends State<AddProduct> {
                       child: const Icon(Icons.photo_library),
                     ),
                     Center(
-                      child: (previewImage()),
+                      child: !kIsWeb &&
+                              defaultTargetPlatform == TargetPlatform.android
+                          ? FutureBuilder<void>(
+                              future: retrieveLostData(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<void> snapshot) {
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.none:
+                                  case ConnectionState.waiting:
+                                    return const Text(
+                                      'You have not yet picked an image.',
+                                      textAlign: TextAlign.center,
+                                    );
+                                  case ConnectionState.done:
+                                    return previewImage();
+                                  default:
+                                    if (snapshot.hasError) {
+                                      return Text(
+                                        'Pick image: ${snapshot.error}}',
+                                        textAlign: TextAlign.center,
+                                      );
+                                    } else {
+                                      return const Text(
+                                        'You have not yet picked an image.',
+                                        textAlign: TextAlign.center,
+                                      );
+                                    }
+                                }
+                              },
+                            )
+                          : previewImage(),
                     ),
                     FormBuilderTextField(
                       attribute: "description",
                       initialValue: null,
-                      decoration: InputDecoration(labelText: "Description"),
+                      decoration: InputDecoration(
+                        labelText: "Description",
+                        icon: new Icon(
+                          Icons.description,
+                          color: Colors.grey,
+                        ),
+                        // border: InputBorder.none,
+                      ),
                       onChanged: (val) => house.description = val,
                       validators: [
                         FormBuilderValidators.required(),
@@ -370,15 +528,17 @@ class _AddProductState extends State<AddProduct> {
                           width: 400.0,
                           child: new RaisedButton(
                               elevation: 5.0,
-                              shape: new RoundedRectangleBorder(
-                                  borderRadius:
-                                      new BorderRadius.circular(30.0)),
-                              color: Colors.blue,
+                              // shape: new RoundedRectangleBorder(
+                              //     borderRadius:
+                              //         new BorderRadius.circular(30.0)),
+                              color: Colors.grey,
                               child: new Text('Add Product',
                                   style: new TextStyle(
                                       fontSize: 20.0, color: Colors.white)),
                               onPressed: () {
                                 if (formKey.currentState.saveAndValidate()) {
+                                  // uploadFile(mediaInfo, 'House images',
+                                  //     mediaInfo.fileName);
                                   uploadImage();
                                 }
                               }),
@@ -429,8 +589,14 @@ class _AddProductState extends State<AddProduct> {
       return retrieveError;
     }
     if (imageFile != null) {
-      sampleImage = File(imageFile.path);
-      return Image.file(File(imageFile.path));
+      sampleImage = io.File(imageFile.path);
+      if (kIsWeb) {
+        return Image.network(imageFile.path);
+      } else {
+        return Image.file(io.File((imageFile.path)));
+      }
+      // sampleImage = File(imageFile.path);
+      // return Image.file(File(imageFile.path));
     } else if (pickImageError != null) {
       return Text(
         'Pick image error: $pickImageError',
